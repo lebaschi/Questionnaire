@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questionnaire App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="appContainer">
+    <div class="headline">
+      <h1>Questionnaire</h1>
+    </div>
+
+    <div id="loginForm">
+      <button id="signIn" class="signButton">Sign in</button>
+    </div>
+
+    <div id="loginContent">
+      <form id="questionForm">
+        <p class="questionTitle">Pick a color</p>
+        <div class="radioButtonContainer sectionContainer">
+          <input id="red" type="radio" name="singleChoice" value="red" checked><label class="radioLabel" for="red"><span
+              class="red"></span></label>
+
+          <input id="blue" type="radio" name="singleChoice" value="blue"><label class="radioLabel" for="blue"><span
+              class="blue"></span></label>
+
+          <input id="green" type="radio" name="singleChoice" value="green"><label class="radioLabel" for="green"><span
+              class="green"></span></label>
+
+          <input id="yellow" type="radio" name="singleChoice" value="yellow"><label class="radioLabel"
+            for="yellow"><span class="yellow"></span></label>
+
+          <input id="purple" type="radio" name="singleChoice" value="purple"><label class="radioLabel"
+            for="purple"><span class="purple"></span></label>
+        </div>
+
+        <p class="questionTitle">Choose animals</p>
+        <div class="sectionContainer">
+          <label class="checkboxContainer"><input type="checkbox" name="multipleChoice"
+              value="fox"><span>Fox</span></label>
+
+          <label class="checkboxContainer"><input type="checkbox" name="multipleChoice"
+              value="rabbit"><span>Rabbit</span></label>
+
+          <label class="checkboxContainer"><input type="checkbox" name="multipleChoice"
+              value="deer"><span>Deer</span></label>
+        </div>
+
+        <p class="questionTitle">Last name</p>
+        <div class="sectionContainer"><input class="textField" type="text" size="30" name="textChoice"></div>
+        <button type="submit" id="submit" class="submitButton signButton">Submit</button>
+      </form>
+    </div>
+
+    <div id="answerContent">
+      <div class="answerForm">
+        <p class="questionTitle">Preferred Color</p>
+        <p id="colorChoice" class="answerText"></p>
+
+        <p class="questionTitle">Animal Choices</p>
+        <p id="animalChoices" class="answerText"></p>
+
+        <p class="questionTitle">Your last name</p>
+        <p id="lastName" class="answerText"></p>
+
+        <button id="change" class="submitButton signButton">Change</button>
+      </div>
+    </div>
+
+    <!-- <button id="logOut" class="signButton">Sign out</button> -->
+
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+    import { getFirestore, collection, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBQLg5dmsEe49CYL1MFK8-ncOKMOrFM_pM",
+      authDomain: "questionnaire-15ea3.firebaseapp.com",
+      projectId: "questionnaire-15ea3",
+      storageBucket: "questionnaire-15ea3.appspot.com",
+      messagingSenderId: "311136187314",
+      appId: "1:311136187314:web:5a817439cdb6ae9373aaab"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginForm = document.getElementById("loginForm");
+    const userEmail = document.getElementById("userEmail");
+    const userPassword = document.getElementById("userPassword");
+    const loginContent = document.getElementById("loginContent");
+    const answerContent = document.getElementById("answerContent");
+    const change = document.getElementById('change');
+    const signIn = document.getElementById("signIn");
+    //const logOut = document.getElementById("logOut");
+
+    const checkUserState = async () => {
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          loginForm.style.display = 'none';
+          loginContent.style.display = 'block';
+        }
+        else {
+          loginForm.style.display = 'block';
+          loginContent.style.display = 'none';
+        }
+      })
+    }
+
+    checkUserState();
+
+    const userSignOut = async () => {
+      await signOut(auth);
+    }
+
+    const userSignAn = () => {
+      signInAnonymously(auth);
+    }
+
+    signIn.addEventListener('click', userSignAn);
+    // logOut.addEventListener('click', userSignOut);
+
+
+    const handleFormSubmission = async (event) => {
+      event.preventDefault();
+
+      const form = document.getElementById("questionForm");
+      const singleChoice = form.querySelector('input[name="singleChoice"]:checked').value;
+      const multipleChoiceCheckboxes = form.querySelectorAll('input[name="multipleChoice"]:checked');
+      const multipleChoiceValues = Array.from(multipleChoiceCheckboxes).map(checkbox => checkbox.value);
+      const textChoice = form.querySelector('input[name="textChoice"]').value;
+
+      if (!singleChoice || multipleChoiceCheckboxes.length === 0 || textChoice.trim() === "") {
+        alert("Please fill out all fields in the form.");
+        return;
+      }
+
+      const user = auth.currentUser;
+
+      if (user) {
+        try {
+          await setDoc(doc(db, "responses", user.uid), {
+            userId: user.uid,
+            singleChoice: singleChoice,
+            multipleChoice: multipleChoiceValues,
+            textChoice: textChoice,
+            timestamp: new Date()
+          });
+
+          document.getElementById("colorChoice").textContent = singleChoice;
+          document.getElementById("animalChoices").textContent = Array.from(multipleChoiceCheckboxes).map(checkbox => checkbox.value).join(", ");
+          document.getElementById("lastName").textContent = textChoice;
+
+          form.reset();
+          loginContent.style.display = 'none';
+          answerContent.style.display = 'block';
+
+        } catch (error) {
+          console.error("Error submitting form:", error);
+        }
+      } else {
+        alert("Please sign in to submit the form.");
+      }
+    };
+
+    const form = document.getElementById("questionForm");
+    form.addEventListener("submit", handleFormSubmission);
+
+    const changeAnswers = () => {
+      answerContent.style.display = 'none';
+      loginContent.style.display = 'block';
+    }
+
+    change.addEventListener('click', changeAnswers)
+
+  </script>
+</body>
+
+</html>
