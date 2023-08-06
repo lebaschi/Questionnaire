@@ -10,15 +10,15 @@
 
 <body>
   <div class="appContainer">
-    <div class="headline">
+    <header class="headline">
       <h1>Questionnaire</h1>
-    </div>
+    </header>
 
-    <div id="loginForm">
-      <button id="signIn" class="signButton">Sign in</button>
-    </div>
+    <section id="loginForm">
+      <button id="signIn" class="signButton" tabindex="0">Sign in</button>
+    </section>
 
-    <div id="loginContent">
+    <main id="loginContent">
       <form id="questionForm">
         <p class="questionTitle">Pick a color</p>
         <div class="radioButtonContainer sectionContainer">
@@ -43,18 +43,18 @@
           <label class="checkboxContainer"><input type="checkbox" name="multipleChoice"
               value="fox"><span>Fox</span></label>
 
-          <label class="checkboxContainer"><input type="checkbox" name="multipleChoice"
+          <label class="checkboxContainer" ><input type="checkbox" name="multipleChoice"
               value="rabbit"><span>Rabbit</span></label>
 
           <label class="checkboxContainer"><input type="checkbox" name="multipleChoice"
               value="deer"><span>Deer</span></label>
         </div>
 
-        <p class="questionTitle">Last name</p>
+        <label class="questionTitle labelTitle" for="textChoice">Last name</label>
         <div class="sectionContainer"><input class="textField" type="text" size="30" name="textChoice"></div>
         <button type="submit" id="submit" class="submitButton signButton">Submit</button>
       </form>
-    </div>
+    </main>
 
     <div id="answerContent">
       <div class="answerForm">

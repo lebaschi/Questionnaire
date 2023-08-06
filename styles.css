@@ -66,7 +66,8 @@ h1::first-letter{
 
 #questionForm{
   background-color: white;
-  width: 500px;
+  width: 30%;
+  width: 450px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -80,12 +81,20 @@ h1::first-letter{
   letter-spacing: 1px;
 }
 
-.sectionContainer{
-  margin-bottom: 15px;
-}
 .questionTitle::first-letter{
   color: #FF7F50;
   font-weight: 100;
+}
+
+.labelTitle{
+margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+.sectionContainer{
+  margin-bottom: 15px;
 }
 
 .radioButtonContainer{
@@ -195,7 +204,7 @@ input[type="radio"]:checked + .radioLabel span {
 
 .answerForm{
   background-color: white;
-  width: 500px;
+  width: 450px;
   display: flex;
   flex-direction: column;
   align-items: center;
